@@ -6,42 +6,14 @@
 
 ## 设计原则
 
+采用Ant Design VUE 框架
+
 ### 视觉设计原则
 - **简洁清晰**: 减少视觉噪音，突出核心内容
 - **一致性**: 统一的设计语言和交互模式
 - **可访问性**: 支持键盘导航，满足无障碍要求
 - **响应式**: 适配桌面、平板、手机等不同设备
 
-### 色彩方案
-```css
-/* 主色调 */
---primary-color: #2563eb;     /* 蓝色 - 主要按钮、链接 */
---primary-light: #3b82f6;     /* 浅蓝色 - 悬停状态 */
---primary-dark: #1d4ed8;      /* 深蓝色 - 激活状态 */
-
-/* 辅助色 */
---secondary-color: #64748b;   /* 灰蓝色 - 次要文本 */
---accent-color: #10b981;      /* 绿色 - 成功状态 */
---warning-color: #f59e0b;     /* 橙色 - 警告状态 */
---error-color: #ef4444;       /* 红色 - 错误状态 */
-
-/* 中性色 */
---gray-50: #f8fafc;
---gray-100: #f1f5f9;
---gray-200: #e2e8f0;
---gray-300: #cbd5e1;
---gray-400: #94a3b8;
---gray-500: #64748b;
---gray-600: #475569;
---gray-700: #334155;
---gray-800: #1e293b;
---gray-900: #0f172a;
-
-/* 背景色 */
---bg-primary: #ffffff;
---bg-secondary: #f8fafc;
---bg-tertiary: #f1f5f9;
-```
 
 ### 字体系统
 ```css
