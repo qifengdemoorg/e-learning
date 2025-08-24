@@ -1,0 +1,116 @@
+# 依赖目录
+node_modules/
+target/
+.gradle/
+build/
+
+# 构建输出
+dist/
+build/
+out/
+
+# 环境变量文件
+.env
+.env.local
+.env.*.local
+
+# IDE 文件
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# 系统文件
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# 日志文件
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 运行时文件
+*.pid
+*.seed
+*.pid.lock
+
+# 覆盖率目录
+coverage/
+*.lcov
+
+# nyc 测试覆盖率
+.nyc_output
+
+# 依赖锁文件 (保留 package-lock.json，删除其他)
+yarn.lock
+pnpm-lock.yaml
+
+# 临时文件
+temp/
+tmp/
+*.tmp
+*.swp
+*.swo
+
+# 数据库文件
+*.db
+*.sqlite
+*.sqlite3
+
+# Docker
+.docker/
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+
+# Gradle
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+!gradle-wrapper.properties
+
+# Spring Boot
+spring-boot*.log
+
+# 备份文件
+*.bak
+*.backup
+*~
+
+# JetBrains
+.idea/
+*.iml
+*.ipr
+
+# Eclipse
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.recommenders
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
