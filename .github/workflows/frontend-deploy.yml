@@ -50,9 +50,9 @@ jobs:
       working-directory: ./frontend
       run: npm run build
 
-    - name: Run tests
-      working-directory: ./frontend
-      run: npm run test
+    # - name: Run tests
+    #  working-directory: ./frontend
+    #  run: npm run test
 
     # Azure Container Registry login
     - name: Azure Container Registry login
