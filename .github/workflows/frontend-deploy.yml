@@ -67,7 +67,7 @@ jobs:
       uses: azure/docker-login@v1
       with:
         login-server: ${{ env.ACR_LOGIN_SERVER }}
-        username: ${{ env.ACR_USERNAME}}
+        username: ${{ secrets.ACR_USERNAME || 'dummy-user' }}
         password: ${{ secrets.ACR_PASSWORD || 'dummy-password' }}
 
     # Extract metadata for Docker image
@@ -78,8 +78,8 @@ jobs:
         images: ${{ env.ACR_LOGIN_SERVER }}/${{ env.CONTAINER_NAME }}
         tags: |
           type=ref,event=branch
-          type=ref,event=pr
-          type=sha,prefix={{branch}}-
+          type=ref,event=pr,prefix=pr-
+          type=sha,format=short
           type=raw,value=latest,enable={{is_default_branch}}
 
     # Build and push Docker image (only on main branch)
@@ -139,7 +139,7 @@ jobs:
     - name: Azure Login
       uses: azure/login@v1
       with:
-        creds: ${{ secrets.AZURE_CREDENTIALS || '{}' }}
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
     
     - name: Set up kubectl
       uses: azure/setup-kubectl@v3
