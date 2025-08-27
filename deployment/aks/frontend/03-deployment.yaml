@@ -38,7 +38,7 @@ spec:
         fsGroup: 1001
       containers:
       - name: frontend
-        image: #{ACR_LOGIN_SERVER}#/elearning-frontend:#{IMAGE_TAG}#
+        image: democrhk.azurecr.io/elearning-frontend:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8080

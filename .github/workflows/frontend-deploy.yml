@@ -123,7 +123,7 @@ jobs:
     - name: Run Trivy security scan
       run: |
         echo "Security scan would run here for PR"
-        echo "Image tag: ${{ needs.build.outputs.image.name }}"
+        echo "Image tag: ${{ needs.build.outputs.image-tag }}"
 
   deploy:
     needs: [build]
@@ -161,7 +161,7 @@ jobs:
       id: image_info
       run: |
         # 从构建输出中提取镜像标签
-        FULL_IMAGE_TAGS="${{ needs.build.outputs.image.name }}"
+        FULL_IMAGE_TAGS="${{ needs.build.outputs.image-tag }}"
         echo "Full image tags from build: $FULL_IMAGE_TAGS"
         
         # metadata-action 返回的是多行标签，我们需要获取完整的镜像名称:标签
