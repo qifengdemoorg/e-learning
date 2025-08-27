@@ -13,10 +13,10 @@ on:
       - '.github/workflows/frontend-deploy.yml'
 
 env:
-  AZURE_CONTAINER_REGISTRY: ${{ secrets.ACR_NAME }}
+  AZURE_CONTAINER_REGISTRY: democrhk
   CONTAINER_NAME: elearning-frontend
-  RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
-  CLUSTER_NAME: ${{ secrets.AKS_CLUSTER_NAME }}
+  RESOURCE_GROUP: DemoAKS-RG-HK
+  CLUSTER_NAME: demoaks-hk
   DEPLOYMENT_MANIFEST_PATH: 'deployment/aks/frontend'
 
 jobs:
@@ -58,9 +58,9 @@ jobs:
     - name: Azure Container Registry login
       uses: azure/docker-login@v1
       with:
-        login-server: ${{ secrets.ACR_LOGIN_SERVER }}
-        username: ${{ secrets.ACR_USERNAME }}
-        password: ${{ secrets.ACR_PASSWORD }}
+        login-server: democrhk.azurecr.io
+        username: democrhk
+        password: eBlJG5qPpUNVONRdeL2lC00aoGH0wrwz916EkDqfnA+ACRAOpnmw
 
     # Extract metadata for Docker image
     - name: Extract metadata
