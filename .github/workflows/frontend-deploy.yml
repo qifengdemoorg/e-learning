@@ -2,7 +2,7 @@ name: Frontend CI/CD - Azure AKS
 
 on:
   pull_request:
-    branches: [main, develop]
+    # branches: [main, develop]
     paths:
       - 'frontend/**'
       - '.github/workflows/frontend-deploy.yml'
