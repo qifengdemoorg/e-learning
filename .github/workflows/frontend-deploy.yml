@@ -1,0 +1,205 @@
+name: Frontend CI/CD - Azure AKS
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend-deploy.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend-deploy.yml'
+
+env:
+  AZURE_CONTAINER_REGISTRY: ${{ secrets.ACR_NAME }}
+  CONTAINER_NAME: elearning-frontend
+  RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+  CLUSTER_NAME: ${{ secrets.AKS_CLUSTER_NAME }}
+  DEPLOYMENT_MANIFEST_PATH: 'deployment/aks/frontend'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+      image-digest: ${{ steps.build.outputs.digest }}
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+        cache: 'npm'
+        cache-dependency-path: 'frontend/package-lock.json'
+
+    - name: Install dependencies
+      working-directory: ./frontend
+      run: npm ci
+
+    - name: Run type checking
+      working-directory: ./frontend
+      run: npm run type-check
+
+    - name: Build application
+      working-directory: ./frontend
+      run: npm run build
+
+    - name: Run tests
+      working-directory: ./frontend
+      run: npm run test
+
+    # Azure Container Registry login
+    - name: Azure Container Registry login
+      uses: azure/docker-login@v1
+      with:
+        login-server: ${{ secrets.ACR_LOGIN_SERVER }}
+        username: ${{ secrets.ACR_USERNAME }}
+        password: ${{ secrets.ACR_PASSWORD }}
+
+    # Extract metadata for Docker image
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.CONTAINER_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+
+    # Build and push Docker image
+    - name: Build and push Docker image
+      id: build
+      uses: docker/build-push-action@v5
+      with:
+        context: ./frontend
+        file: ./frontend/Dockerfile
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        build-args: |
+          VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}
+          VITE_APP_TITLE=Contoso E-Learning Platform
+
+  deploy:
+    needs: [build, security-scan]
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+    - name: Set up kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'latest'
+    
+    - name: Get AKS credentials
+      run: |
+        az aks get-credentials --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --name ${{ env.AZURE_AKS_CLUSTER }}
+    
+    - name: Create namespace if not exists
+      run: |
+        kubectl apply -f deployment/aks/frontend/01-namespace.yaml
+    
+    - name: Apply ConfigMaps and Secrets
+      run: |
+        kubectl apply -f deployment/aks/frontend/02-configmap.yaml
+    
+    - name: Update deployment image
+      run: |
+        # Update deployment manifest with new image tag
+        sed -i "s|image: .*elearning-frontend:.*|image: ${{ env.AZURE_REGISTRY_NAME }}.azurecr.io/elearning-frontend:${{ github.sha }}|g" deployment/aks/frontend/03-deployment.yaml
+    
+    - name: Deploy application
+      run: |
+        # Apply all manifests in order
+        kubectl apply -f deployment/aks/frontend/03-deployment.yaml
+        kubectl apply -f deployment/aks/frontend/04-service.yaml
+        kubectl apply -f deployment/aks/frontend/05-ingress.yaml
+        kubectl apply -f deployment/aks/frontend/06-hpa.yaml
+        kubectl apply -f deployment/aks/frontend/07-network-policy.yaml
+    
+    - name: Wait for deployment rollout
+      run: |
+        kubectl rollout status deployment/elearning-frontend-deployment -n elearning --timeout=600s
+    
+    - name: Verify deployment health
+      run: |
+        echo "Checking pod status..."
+        kubectl get pods -n elearning -l app=elearning-frontend
+        
+        echo "Checking service status..."
+        kubectl get svc -n elearning -l app=elearning-frontend
+        
+        echo "Checking ingress status..."
+        kubectl get ingress -n elearning
+        
+        echo "Checking HPA status..."
+        kubectl get hpa -n elearning
+        
+        # Wait for pods to be ready
+        kubectl wait --for=condition=ready pod -l app=elearning-frontend -n elearning --timeout=300s
+    
+    - name: Run health check
+      run: |
+        # Get service endpoint for health check
+        SERVICE_IP=$(kubectl get service elearning-frontend-service -n elearning -o jsonpath='{.status.loadBalancer.ingress[0].ip}' || echo "")
+        
+        if [ -n "$SERVICE_IP" ]; then
+          echo "Running health check against $SERVICE_IP..."
+          for i in {1..10}; do
+            if curl -f http://$SERVICE_IP/health; then
+              echo "Health check passed!"
+              break
+            else
+              echo "Health check attempt $i failed, retrying in 30 seconds..."
+              sleep 30
+            fi
+          done
+        else
+          echo "External IP not yet assigned, skipping external health check"
+          # Internal health check via port-forward
+          kubectl port-forward service/elearning-frontend-service 8080:80 -n elearning &
+          PORT_FORWARD_PID=$!
+          sleep 10
+          curl -f http://localhost:8080/health || echo "Internal health check failed"
+          kill $PORT_FORWARD_PID || true
+        fi
+
+  security-scan:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # Run Trivy vulnerability scanner
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: ${{ needs.build.outputs.image-tag }}
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    # Upload Trivy scan results to GitHub Security tab
+    - name: Upload Trivy scan results
+      uses: github/codeql-action/upload-sarif@v3
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
