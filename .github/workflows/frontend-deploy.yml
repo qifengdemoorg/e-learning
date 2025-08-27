@@ -161,20 +161,35 @@ jobs:
     - name: Update deployment image
       run: |
         # Update deployment manifest with new image tag
-        sed -i "s|image: .*elearning-frontend:.*|image: ${{ env.ACR_LOGIN_SERVER }}/elearning-frontend:${{ github.sha }}|g" deployment/aks/frontend/03-deployment.yaml
+        sed -i "s|#{ACR_LOGIN_SERVER}#|${{ env.ACR_LOGIN_SERVER }}|g" deployment/aks/frontend/03-deployment.yaml
+        sed -i "s|#{IMAGE_TAG}#|${{ github.sha }}|g" deployment/aks/frontend/03-deployment.yaml
+        sed -i "s|#{VITE_API_BASE_URL}#|https://api.elearning.demo.com|g" deployment/aks/frontend/03-deployment.yaml
+        
+        echo "Updated deployment manifest:"
+        cat deployment/aks/frontend/03-deployment.yaml | grep -A 5 -B 5 "image:"
     
     - name: Deploy application
       run: |
         # Apply all manifests in order
+        echo "Applying deployment manifest..."
         kubectl apply -f deployment/aks/frontend/03-deployment.yaml
+        
+        echo "Applying service manifest..."
         kubectl apply -f deployment/aks/frontend/04-service.yaml
+        
+        echo "Applying ingress manifest..."
         kubectl apply -f deployment/aks/frontend/05-ingress.yaml
+        
+        echo "Applying HPA manifest..."
         kubectl apply -f deployment/aks/frontend/06-hpa.yaml
+        
+        echo "Checking deployment status..."
+        kubectl get deployments -n elearning
        # kubectl apply -f deployment/aks/frontend/07-network-policy.yaml
     
     - name: Wait for deployment rollout
       run: |
-        kubectl rollout status deployment/elearning-frontend-deployment -n elearning --timeout=600s
+        kubectl rollout status deployment/elearning-frontend -n elearning --timeout=600s
     
     - name: Verify deployment health
       run: |
