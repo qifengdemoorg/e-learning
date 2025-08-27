@@ -178,13 +178,26 @@ jobs:
     
     - name: Update deployment image
       run: |
-        # Update deployment manifest with the actual built image tag
-        sed -i "s|#{ACR_LOGIN_SERVER}#|${{ env.ACR_LOGIN_SERVER }}|g" deployment/aks/frontend/03-deployment.yaml
-        sed -i "s|#{IMAGE_TAG}#|${{ steps.image_info.outputs.tag_only }}|g" deployment/aks/frontend/03-deployment.yaml
-        sed -i "s|#{VITE_API_BASE_URL}#|https://api.elearning.demo.com|g" deployment/aks/frontend/03-deployment.yaml
+        # Create a backup of the original file
+        cp deployment/aks/frontend/03-deployment.yaml deployment/aks/frontend/03-deployment.yaml.backup
         
-        echo "Updated deployment manifest:"
-        cat deployment/aks/frontend/03-deployment.yaml | grep -A 5 -B 5 "image:"
+        # Update deployment manifest with the actual built image tag
+        # Use single quotes and escape properly to avoid YAML issues
+        sed -i 's|#{ACR_LOGIN_SERVER}#|${{ env.ACR_LOGIN_SERVER }}|g' deployment/aks/frontend/03-deployment.yaml
+        sed -i 's|#{IMAGE_TAG}#|${{ steps.image_info.outputs.tag_only }}|g' deployment/aks/frontend/03-deployment.yaml
+        
+        # For URL replacement, ensure proper quoting
+        API_BASE_URL="https://api.elearning.demo.com"
+        sed -i "s|#{VITE_API_BASE_URL}#|${API_BASE_URL}|g" deployment/aks/frontend/03-deployment.yaml
+        
+        echo "=== Updated deployment manifest ==="
+        cat deployment/aks/frontend/03-deployment.yaml | grep -A 10 -B 5 "image:"
+        
+        echo "=== Environment variables section ==="
+        cat deployment/aks/frontend/03-deployment.yaml | grep -A 10 -B 2 "VITE_API_BASE_URL"
+        
+        echo "=== Validating YAML syntax ==="
+        kubectl apply --dry-run=client -f deployment/aks/frontend/03-deployment.yaml
         
         echo "Using full image: ${{ steps.image_info.outputs.full_image }}"
         echo "Using tag: ${{ steps.image_info.outputs.tag_only }}"
