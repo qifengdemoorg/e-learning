@@ -79,7 +79,6 @@ jobs:
         tags: |
           type=ref,event=branch
           type=ref,event=pr,prefix=pr-
-        # type=sha,format=short
           type=raw,value=latest,enable={{is_default_branch}}
 
     # Build and push Docker image (only on main branch)
