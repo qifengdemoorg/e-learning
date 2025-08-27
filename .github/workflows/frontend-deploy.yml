@@ -2,7 +2,7 @@ name: Frontend CI/CD - Azure AKS
 
 on:
   pull_request:
-    branches: [main, develop]
+    # branches: [main, develop]
     paths:
       - 'frontend/**'
       - '.github/workflows/frontend-deploy.yml'
@@ -79,7 +79,6 @@ jobs:
         tags: |
           type=ref,event=branch
           type=ref,event=pr,prefix=pr-
-          type=sha,format=short
           type=raw,value=latest,enable={{is_default_branch}}
 
     # Build and push Docker image (only on main branch)
@@ -158,15 +157,37 @@ jobs:
       run: |
         kubectl apply -f deployment/aks/frontend/02-configmap.yaml
     
+    - name: Extract image tag from build output
+      id: image_info
+      run: |
+        # 从构建输出中提取镜像标签
+        FULL_IMAGE_TAGS="${{ needs.build.outputs.image-tag }}"
+        echo "Full image tags from build: $FULL_IMAGE_TAGS"
+        
+        # metadata-action 返回的是多行标签，我们需要获取完整的镜像名称:标签
+        # 通常第一行是主要标签
+        MAIN_IMAGE_TAG=$(echo "$FULL_IMAGE_TAGS" | head -n1)
+        echo "Using main image tag: $MAIN_IMAGE_TAG"
+        
+        # 从完整镜像名称中提取标签部分
+        TAG_ONLY=$(echo "$MAIN_IMAGE_TAG" | cut -d':' -f2)
+        echo "Tag only: $TAG_ONLY"
+        
+        echo "full_image=$MAIN_IMAGE_TAG" >> $GITHUB_OUTPUT
+        echo "tag_only=$TAG_ONLY" >> $GITHUB_OUTPUT
+    
     - name: Update deployment image
       run: |
-        # Update deployment manifest with new image tag
+        # Update deployment manifest with the actual built image tag
         sed -i "s|#{ACR_LOGIN_SERVER}#|${{ env.ACR_LOGIN_SERVER }}|g" deployment/aks/frontend/03-deployment.yaml
-        sed -i "s|#{IMAGE_TAG}#|${{ github.sha }}|g" deployment/aks/frontend/03-deployment.yaml
+        sed -i "s|#{IMAGE_TAG}#|${{ steps.image_info.outputs.tag_only }}|g" deployment/aks/frontend/03-deployment.yaml
         sed -i "s|#{VITE_API_BASE_URL}#|https://api.elearning.demo.com|g" deployment/aks/frontend/03-deployment.yaml
         
         echo "Updated deployment manifest:"
         cat deployment/aks/frontend/03-deployment.yaml | grep -A 5 -B 5 "image:"
+        
+        echo "Using full image: ${{ steps.image_info.outputs.full_image }}"
+        echo "Using tag: ${{ steps.image_info.outputs.tag_only }}"
     
     - name: Deploy application
       run: |
