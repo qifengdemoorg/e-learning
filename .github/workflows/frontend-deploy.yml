@@ -6,11 +6,13 @@ on:
     paths:
       - 'frontend/**'
       - '.github/workflows/frontend-deploy.yml'
+      - 'deployment/aks/frontend/**'
   push:
     branches: [main]
     paths:
       - 'frontend/**'
       - '.github/workflows/frontend-deploy.yml'
+      - 'deployment/aks/frontend/**'
 
 env:
   AZURE_CONTAINER_REGISTRY: democrhk
