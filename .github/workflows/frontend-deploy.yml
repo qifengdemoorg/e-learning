@@ -170,7 +170,7 @@ jobs:
         kubectl apply -f deployment/aks/frontend/04-service.yaml
         kubectl apply -f deployment/aks/frontend/05-ingress.yaml
         kubectl apply -f deployment/aks/frontend/06-hpa.yaml
-        kubectl apply -f deployment/aks/frontend/07-network-policy.yaml
+       # kubectl apply -f deployment/aks/frontend/07-network-policy.yaml
     
     - name: Wait for deployment rollout
       run: |
