@@ -67,7 +67,7 @@ jobs:
       uses: azure/docker-login@v1
       with:
         login-server: ${{ env.ACR_LOGIN_SERVER }}
-        username: ${{ env.AZURE_CONTAINER_REGISTRY }}
+        username: ${{ env.ACR_USERNAME}}
         password: ${{ secrets.ACR_PASSWORD || 'dummy-password' }}
 
     # Extract metadata for Docker image
