@@ -1,0 +1,88 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: elearning-frontend-network-policy
+  namespace: elearning
+  labels:
+    app: elearning-frontend
+    component: frontend
+spec:
+  podSelector:
+    matchLabels:
+      app: elearning-frontend
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Allow traffic from ingress controllers
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    ports:
+    - protocol: TCP
+      port: 8080
+  # Allow traffic from other frontend pods (for internal communication)
+  - from:
+    - podSelector:
+        matchLabels:
+          app: elearning-frontend
+    ports:
+    - protocol: TCP
+      port: 8080
+  # Allow monitoring traffic from Prometheus
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+    ports:
+    - protocol: TCP
+      port: 8080
+  egress:
+  # Allow DNS resolution
+  - to: []
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+  # Allow HTTPS traffic to external services (CDNs, APIs)
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443
+  # Allow HTTP traffic to external services (if needed)
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 80
+  # Allow backend API communication
+  - to:
+    - podSelector:
+        matchLabels:
+          app: elearning-backend
+    ports:
+    - protocol: TCP
+      port: 8000
+
+---
+apiVersion: v1
+kind: ServiceMonitor
+metadata:
+  name: elearning-frontend-metrics
+  namespace: elearning
+  labels:
+    app: elearning-frontend
+    component: frontend
+spec:
+  selector:
+    matchLabels:
+      app: elearning-frontend
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 30s
+    scrapeTimeout: 10s

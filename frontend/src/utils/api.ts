@@ -33,11 +33,24 @@ api.interceptors.response.use(
   }
 )
 
+// 辅助函数：确保返回 ApiResponse 格式
+function ensureApiResponse<T>(data: any): ApiResponse<T> {
+  if (data && typeof data === 'object' && 'success' in data) {
+    return data as ApiResponse<T>
+  }
+  
+  return {
+    success: true,
+    data: data,
+    message: '操作成功'
+  } as ApiResponse<T>
+}
+
 // 认证相关 API
 export const login = async (credentials: LoginCredentials): Promise<ApiResponse<{ token: string; user: User }>> => {
   try {
     const response = await api.post('/auth/login', credentials)
-    return response
+    return ensureApiResponse<{ token: string; user: User }>(response)
   } catch (error: any) {
     return {
       success: false,
@@ -49,7 +62,7 @@ export const login = async (credentials: LoginCredentials): Promise<ApiResponse<
 export const register = async (data: RegisterData): Promise<ApiResponse<User>> => {
   try {
     const response = await api.post('/auth/register', data)
-    return response
+    return ensureApiResponse<User>(response)
   } catch (error: any) {
     return {
       success: false,
@@ -61,7 +74,7 @@ export const register = async (data: RegisterData): Promise<ApiResponse<User>> =
 export const logout = async (): Promise<ApiResponse> => {
   try {
     const response = await api.post('/auth/logout')
-    return response
+    return ensureApiResponse(response)
   } catch (error: any) {
     return {
       success: false,
@@ -73,7 +86,7 @@ export const logout = async (): Promise<ApiResponse> => {
 export const getCurrentUser = async (): Promise<ApiResponse<User>> => {
   try {
     const response = await api.get('/auth/me')
-    return response
+    return ensureApiResponse<User>(response)
   } catch (error: any) {
     return {
       success: false,
@@ -92,7 +105,7 @@ export const getCourses = async (params?: {
 }): Promise<ApiResponse<{ courses: Course[]; total: number }>> => {
   try {
     const response = await api.get('/courses', { params })
-    return response
+    return ensureApiResponse<{ courses: Course[]; total: number }>(response)
   } catch (error: any) {
     return {
       success: false,
@@ -104,7 +117,7 @@ export const getCourses = async (params?: {
 export const getCourse = async (id: number): Promise<ApiResponse<Course>> => {
   try {
     const response = await api.get(`/courses/${id}`)
-    return response
+    return ensureApiResponse<Course>(response)
   } catch (error: any) {
     return {
       success: false,
