@@ -95,7 +95,7 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         build-args: |
-          VITE_API_BASE_URL=https://api.elearning.demo.com
+          VITE_API_BASE_URL=https://localhost:8000/api
           VITE_APP_TITLE=Contoso E-Learning Platform
 
     # Build only for PR (no push)
@@ -109,7 +109,7 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         build-args: |
-          VITE_API_BASE_URL=https://api.elearning.demo.com
+          VITE_API_BASE_URL=http://localhost:8000/api
           VITE_APP_TITLE=Contoso E-Learning Platform
 
   security-scan:
