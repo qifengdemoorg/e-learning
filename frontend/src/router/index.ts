@@ -70,6 +70,12 @@ const router = createRouter({
       component: () => import('@/views/admin/AnalyticsView.vue'),
       meta: { requiresAuth: true, requiresAdmin: true }
     },
+    {
+      path: '/admin/categories',
+      name: 'admin-categories',
+      component: () => import('@/views/admin/CategoriesManagement.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
+    },
     // 重定向根路径到登录页面
     {
       path: '/:pathMatch(.*)*',

@@ -25,24 +25,59 @@
 
       <!-- Menu Items -->
       <div class="menu-container">
-        <div 
-          v-for="item in menuItems" 
-          :key="item.key" 
-          :class="['menu-item', { 'active': selectedKeys.includes(item.key) }]"
-          @click="handleMenuClick({ key: item.key })"
-          v-show="!item.adminOnly || isAdmin"
+        <a-menu
+          v-model:selectedKeys="selectedKeys"
+          v-model:openKeys="openKeys"
+          mode="inline"
+          :theme="'light'"
+          :inline-collapsed="collapsed"
+          @click="handleMenuClick"
         >
-          <AppstoreOutlined v-if="item.icon === 'AppstoreOutlined'" />
-          <BookOutlined v-else-if="item.icon === 'BookOutlined'" />
-          <TeamOutlined v-else-if="item.icon === 'TeamOutlined'" />
-          <BarChartOutlined v-else-if="item.icon === 'BarChartOutlined'" />
-          <UserOutlined v-else-if="item.icon === 'UserOutlined'" />
-          <FileOutlined v-else-if="item.icon === 'FileOutlined'" />
-          <SettingOutlined v-else-if="item.icon === 'SettingOutlined'" />
-          <DeleteOutlined v-else-if="item.icon === 'DeleteOutlined'" />
-          <TagsOutlined v-else-if="item.icon === 'TagsOutlined'" />
-          <span v-if="!collapsed">{{ item.title }}</span>
-        </div>
+          <!-- 基础菜单项 -->
+          <a-menu-item 
+            v-for="item in basicMenuItems" 
+            :key="item.key"
+            @click="handleMenuClick({ key: item.key })"
+          >
+            <AppstoreOutlined v-if="item.icon === 'AppstoreOutlined'" />
+            <BookOutlined v-else-if="item.icon === 'BookOutlined'" />
+            <TeamOutlined v-else-if="item.icon === 'TeamOutlined'" />
+            <BarChartOutlined v-else-if="item.icon === 'BarChartOutlined'" />
+            <UserOutlined v-else-if="item.icon === 'UserOutlined'" />
+            <FileOutlined v-else-if="item.icon === 'FileOutlined'" />
+            <DeleteOutlined v-else-if="item.icon === 'DeleteOutlined'" />
+            <span>{{ item.title }}</span>
+          </a-menu-item>
+
+          <!-- 设置子菜单 -->
+          <a-sub-menu key="settings" :title="'设置'">
+            <template #icon>
+              <SettingOutlined />
+            </template>
+            
+            <!-- 个人设置 -->
+            <a-menu-item key="personal-settings" @click="handleMenuClick({ key: 'personal-settings' })">
+              <UserOutlined />
+              <span>个人设置</span>
+            </a-menu-item>
+
+            <!-- 管理员功能分组 -->
+            <a-menu-item-group v-if="isAdmin" title="管理员功能">
+              <a-menu-item key="admin-users" @click="handleMenuClick({ key: 'admin-users' })">
+                <UserOutlined />
+                <span>用户管理</span>
+              </a-menu-item>
+              <a-menu-item key="admin-courses" @click="handleMenuClick({ key: 'admin-courses' })">
+                <BookOutlined />
+                <span>课程管理</span>
+              </a-menu-item>
+              <a-menu-item key="admin-categories" @click="handleMenuClick({ key: 'admin-categories' })">
+                <TagsOutlined />
+                <span>分类管理</span>
+              </a-menu-item>
+            </a-menu-item-group>
+          </a-sub-menu>
+        </a-menu>
       </div>
 
       <!-- Logout Button -->
@@ -77,6 +112,7 @@ const userStore = useUserStore()
 
 const collapsed = ref(false)
 const selectedKeys = ref<string[]>(['dashboard'])
+const openKeys = ref<string[]>([])
 const defaultAvatar = 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png'
 
 // 检查用户是否为管理员
@@ -84,84 +120,78 @@ const isAdmin = computed(() => {
   return userStore.user?.roleId === 1 // 假设 roleId 1 为管理员
 })
 
-// 菜单项定义
-const menuItems = [
+// 基础菜单项定义（不包括设置）
+const basicMenuItems = [
   {
     key: 'dashboard',
     title: '仪表盘',
     icon: 'AppstoreOutlined',
-    path: '/',
-    adminOnly: false
+    path: '/'
   },
   {
     key: 'catalog',
     title: '课程目录',
     icon: 'BookOutlined',
-    path: '/catalog',
-    adminOnly: false
+    path: '/catalog'
   },
   {
     key: 'courses',
     title: '我的课程',
     icon: 'TeamOutlined',
-    path: '/courses',
-    adminOnly: false
+    path: '/courses'
   },
   {
     key: 'progress',
     title: '学习进度',
     icon: 'BarChartOutlined',
-    path: '/progress',
-    adminOnly: false
+    path: '/progress'
   },
   {
     key: 'profile',
     title: '个人资料',
     icon: 'UserOutlined',
-    path: '/profile',
-    adminOnly: false
+    path: '/profile'
   },
   {
     key: 'downloads',
     title: '资料下载',
     icon: 'FileOutlined',
-    path: '/downloads',
-    adminOnly: false
-  },
-  {
-    key: 'settings',
-    title: '设置',
-    icon: 'SettingOutlined',
-    path: '/settings',
-    adminOnly: false
+    path: '/downloads'
   },
   {
     key: 'trash',
     title: '垃圾桶',
     icon: 'DeleteOutlined',
-    path: '/trash',
-    adminOnly: false
+    path: '/trash'
+  }
+]
+
+// 所有菜单项映射（包括子菜单项）
+const allMenuItems = [
+  ...basicMenuItems,
+  {
+    key: 'personal-settings',
+    title: '个人设置',
+    icon: 'UserOutlined',
+    path: '/settings'
   },
   {
     key: 'admin-users',
     title: '用户管理',
     icon: 'UserOutlined',
-    path: '/admin/users',
-    adminOnly: true
+    path: '/admin/users'
   },
   {
     key: 'admin-courses',
     title: '课程管理',
     icon: 'BookOutlined',
-    path: '/admin/courses',
-    adminOnly: true
+    path: '/admin/courses'
   },
   {
     key: 'admin-categories',
     title: '分类管理',
     icon: 'TagsOutlined',
-    path: '/admin/categories',
-    adminOnly: true
+    path: '/admin/categories'
   }
 ]
 
@@ -169,16 +199,21 @@ const menuItems = [
 watch(
   () => route.path,
   (newPath) => {
-    const menuItem = menuItems.find(item => item.path === newPath)
+    const menuItem = allMenuItems.find(item => item.path === newPath)
     if (menuItem) {
       selectedKeys.value = [menuItem.key]
+      
+      // 如果是设置相关的路由，展开设置子菜单
+      if (menuItem.key === 'personal-settings' || menuItem.key.startsWith('admin-')) {
+        openKeys.value = ['settings']
+      }
     }
   },
   { immediate: true }
 )
 
 const handleMenuClick = ({ key }: { key: string }) => {
-  const menuItem = menuItems.find(item => item.key === key)
+  const menuItem = allMenuItems.find(item => item.key === key)
   if (menuItem) {
     router.push(menuItem.path)
   }
@@ -245,36 +280,40 @@ const toggleCollapsed = () => {
   margin-bottom: 20px;
 }
 
-/* Menu Items Styling */
+/* Menu Items Container */
 .menu-container {
   flex: 1;
-  display: flex;
-  flex-direction: column;
   padding: 0 16px;
 }
 
-.menu-item {
-  display: flex;
-  align-items: center;
-  padding: 12px 16px;
-  margin: 4px 0;
+/* 确保菜单样式正确 */
+.menu-container :deep(.ant-menu) {
+  border: none;
+  background: transparent;
+}
+
+.menu-container :deep(.ant-menu-item) {
   border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s;
-  color: #666;
+  margin: 4px 0;
+  height: auto;
+  padding: 12px 16px;
 }
 
-.menu-item:hover {
-  background-color: rgba(24, 144, 255, 0.1);
+.menu-container :deep(.ant-menu-submenu) {
+  border-radius: 8px;
+  margin: 4px 0;
 }
 
-.menu-item.active {
-  background-color: #1890ff;
-  color: white;
+.menu-container :deep(.ant-menu-submenu-title) {
+  border-radius: 8px;
+  height: auto;
+  padding: 12px 16px;
 }
 
-.menu-item span {
-  margin-left: 12px;
+.menu-container :deep(.ant-menu-item-group-title) {
+  color: #999;
+  font-size: 12px;
+  padding: 8px 16px 4px;
 }
 
 /* Logout Button */
