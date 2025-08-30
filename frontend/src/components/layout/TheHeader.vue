@@ -2,6 +2,16 @@
   <a-layout class="app-header">
     <a-layout-header class="header">
       <div class="header-left">
+        <!-- 侧边栏收缩按钮 -->
+        <a-button 
+          type="text" 
+          class="sidebar-trigger"
+          @click="toggleSidebar"
+        >
+          <MenuUnfoldOutlined v-if="collapsed" />
+          <MenuFoldOutlined v-else />
+        </a-button>
+        
         <div class="logo">
           <img src="/logo.svg" alt="E-Learning" />
           <span class="logo-text">E-Learning Platform</span>
@@ -66,7 +76,9 @@ import {
   DownOutlined,
   UserOutlined,
   SettingOutlined,
-  LogoutOutlined
+  LogoutOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined
 } from '@ant-design/icons-vue'
 import { useUserStore } from '@/stores/user'
 
@@ -75,6 +87,17 @@ const userStore = useUserStore()
 
 const searchValue = ref('')
 const notificationCount = ref(3) // 模拟通知数量
+const collapsed = ref(false) // 侧边栏收缩状态
+
+// 触发侧边栏收缩事件
+const emit = defineEmits<{
+  toggleSidebar: []
+}>()
+
+const toggleSidebar = () => {
+  collapsed.value = !collapsed.value
+  emit('toggleSidebar')
+}
 
 const handleSearch = (value: string) => {
   if (value.trim()) {
@@ -113,11 +136,27 @@ const handleLogout = async () => {
   justify-content: space-between;
   height: 64px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .header-left {
   display: flex;
   align-items: center;
+  gap: 16px;
+}
+
+.sidebar-trigger {
+  font-size: 18px;
+  line-height: 64px;
+  padding: 0 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.sidebar-trigger:hover {
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 .logo {
