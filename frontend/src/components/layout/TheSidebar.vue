@@ -231,6 +231,11 @@ const handleLogout = async () => {
 const toggleCollapsed = () => {
   collapsed.value = !collapsed.value
 }
+
+// 暴露方法给父组件调用
+defineExpose({
+  toggleCollapsed
+})
 </script>
 
 <style scoped>
@@ -238,12 +243,13 @@ const toggleCollapsed = () => {
   background: #fff;
   border-right: 1px solid #f0f0f0;
   position: relative;
-  height: 100vh;
+  height: calc(100vh - 64px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
 }
 
 .sidebar-content {
-  height: 100vh;
+  height: calc(100vh - 64px);
   overflow-y: auto;
   display: flex;
   flex-direction: column;

@@ -1,16 +1,24 @@
 <script setup lang="ts">
 import { RouterView, useRoute } from 'vue-router'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import TheHeader from './components/layout/TheHeader.vue'
 import TheSidebar from './components/layout/TheSidebar.vue'
 import DebugPanel from './components/DebugPanel.vue'
 
 const route = useRoute()
+const sidebarRef = ref()
 
 // 判断是否为认证页面（登录/注册）
 const isAuthPage = computed(() => {
   return route.path === '/login' || route.path === '/register'
 })
+
+// 处理侧边栏收缩事件
+const handleToggleSidebar = () => {
+  if (sidebarRef.value) {
+    sidebarRef.value.toggleCollapsed()
+  }
+}
 </script>
 
 <template>
@@ -23,9 +31,9 @@ const isAuthPage = computed(() => {
     <!-- 主应用布局 -->
     <template v-else>
       <a-layout class="app-layout">
-        <TheHeader />
+        <TheHeader @toggle-sidebar="handleToggleSidebar" />
         <a-layout>
-          <TheSidebar />
+          <TheSidebar ref="sidebarRef" />
           <a-layout-content class="main-content">
             <RouterView />
           </a-layout-content>
