@@ -1,0 +1,26 @@
+# Trivy ignore file for known false positives and accepted risks
+
+# Node.js base image vulnerabilities that are not applicable to our use case
+# CVE-2023-44487 - HTTP/2 vulnerability (not using HTTP/2 in production)
+# CVE-2023-39325 - Go HTTP/2 vulnerability (Node.js app, not Go)
+
+# Frontend specific ignores
+# Development dependencies vulnerabilities (not shipped to production)
+frontend/node_modules/@types/**
+frontend/node_modules/@typescript-eslint/**
+frontend/node_modules/vite/**
+
+# Test files and dev dependencies
+**/*.test.js
+**/*.spec.js
+**/test/**
+**/tests/**
+**/__tests__/**
+
+# Ignore specific vulnerabilities with justification
+# Example: CVE-2021-44228 - Log4j vulnerability (not using Java/Log4j)
+# CVE-2021-44228
+
+# Temporary ignores (should be reviewed regularly)
+# TODO: Review these CVEs and remove from ignore list when fixed
+# CVE-YYYY-XXXXX - Description of why this is temporarily ignored

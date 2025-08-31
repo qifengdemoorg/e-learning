@@ -1,0 +1,43 @@
+# Trivy configuration file
+# For more information, see: https://aquasecurity.github.io/trivy/latest/docs/references/configuration/config-file/
+
+# Scanning options
+scan:
+  # Skip specific scan types if needed
+  # skip-policy-update: false
+  # skip-java-db-update: false
+  
+  # Security scanning
+  security:
+    includes:
+      - "*"
+    excludes: []
+
+# Vulnerability database
+db:
+  # Skip database update for faster scans in CI
+  # skip-update: false
+
+# Output format and filtering
+format: table
+severity:
+  - CRITICAL
+  - HIGH
+  - MEDIUM
+  
+# Exit codes
+exit-code: 1  # Exit with error code if vulnerabilities found
+
+# Vulnerability filtering
+vulnerability:
+  ignore-unfixed: false  # Include vulnerabilities without fixes
+  ignore-policy: .trivyignore  # Use ignore file
+
+# Report formatting
+report:
+  format: all
+  template: "@contrib/html.tpl"
+
+# Cache settings
+cache:
+  dir: /tmp/trivy-cache
