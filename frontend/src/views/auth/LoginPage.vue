@@ -144,13 +144,12 @@ const handleLogin = async () => {
     const result = await userStore.login(formData)
     
     if (result.success) {
-      alert('登录成功！')
       router.push('/')
     } else {
-      alert(result.message || '登录失败')
+      console.error('登录失败:', result.message)
     }
   } catch (error: any) {
-    alert(error.message || '登录失败，请重试')
+    console.error('登录失败:', error.message)
   } finally {
     loading.value = false
   }

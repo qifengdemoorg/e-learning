@@ -118,10 +118,9 @@ const goToSettings = () => {
 const handleLogout = async () => {
   try {
     await userStore.logout()
-    alert('已退出登录')
     router.push('/login')
   } catch (error) {
-    alert('退出登录失败')
+    console.error('退出登录失败:', error)
   }
 }
 </script>
