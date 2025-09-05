@@ -15,12 +15,11 @@ on:
       - 'deployment/aks/frontend/**'
 
 env:
-  AZURE_CONTAINER_REGISTRY: democrhk
   CONTAINER_NAME: elearning-frontend
   RESOURCE_GROUP: DemoAKS-RG-HK
   CLUSTER_NAME: demoaks-hk
   DEPLOYMENT_MANIFEST_PATH: 'deployment/aks/frontend'
-  ACR_LOGIN_SERVER: democrhk.azurecr.io
+  ACR_LOGIN_SERVER: ${{ secrets.ACR_LOGIN_SERVER }}
 
 jobs:
   build:
