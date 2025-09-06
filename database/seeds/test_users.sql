@@ -37,11 +37,11 @@ INSERT INTO categories (name, description, parent_id, display_order) VALUES
 
 -- 插入一些测试课程
 INSERT INTO courses (title, description, category_id, instructor_id, difficulty, duration_hours, thumbnail_url, is_published) VALUES 
-('Vue.js 3 完整教程', '从零开始学习 Vue.js 3，包括组合式 API、路由、状态管理等核心概念', 2, 2, 'beginner', 20, 'https://via.placeholder.com/400x240/1890ff/ffffff?text=Vue.js', TRUE),
-('TypeScript 从入门到精通', '学习 TypeScript 的类型系统，提升 JavaScript 开发效率', 2, 2, 'intermediate', 15, 'https://via.placeholder.com/400x240/3178c6/ffffff?text=TypeScript', TRUE),
-('React 高级开发实战', '深入学习 React 高级特性，包括 Hooks、性能优化等', 2, 2, 'advanced', 25, 'https://via.placeholder.com/400x240/61dafb/000000?text=React', TRUE),
-('Node.js 后端开发', '使用 Node.js 构建高性能的后端 API 服务', 3, 2, 'intermediate', 30, 'https://via.placeholder.com/400x240/339933/ffffff?text=Node.js', TRUE),
-('UI/UX 设计基础', '学习现代 UI/UX 设计原理和设计系统', 4, 2, 'beginner', 18, 'https://via.placeholder.com/400x240/ff6b6b/ffffff?text=Design', TRUE);
+('Vue.js 3 完整教程', '从零开始学习 Vue.js 3，包括组合式 API、路由、状态管理等核心概念', 2, 2, 'beginner', 20, '/images/courses/frontend.jpg', TRUE),
+('TypeScript 从入门到精通', '学习 TypeScript 的类型系统，提升 JavaScript 开发效率', 2, 2, 'intermediate', 15, '/images/courses/typescript.jpg', TRUE),
+('React 高级开发实战', '深入学习 React 高级特性，包括 Hooks、性能优化等', 2, 2, 'advanced', 25, '/images/courses/frontend.jpg', TRUE),
+('Node.js 后端开发', '使用 Node.js 构建高性能的后端 API 服务', 3, 2, 'intermediate', 30, '/images/courses/backend.jpg', TRUE),
+('UI/UX 设计基础', '学习现代 UI/UX 设计原理和设计系统', 4, 2, 'beginner', 18, '/images/courses/design.jpg', TRUE);
 
 -- 为测试用户添加一些课程注册记录
 INSERT INTO enrollments (user_id, course_id, enrolled_at, progress, status) VALUES 

@@ -171,7 +171,7 @@ const courses = ref([
     rating: 4.8,
     students: 1234,
     enrolled: false,
-    thumbnail: 'https://via.placeholder.com/200x120/1890ff/ffffff?text=Vue.js',
+    thumbnail: '/images/courses/frontend.jpg',
     tags: ['Vue.js', 'JavaScript', 'TypeScript']
   },
   {
@@ -187,7 +187,7 @@ const courses = ref([
     rating: 4.9,
     students: 892,
     enrolled: false,
-    thumbnail: 'https://via.placeholder.com/200x120/61dafb/000000?text=React',
+    thumbnail: '/images/courses/frontend.jpg',
     tags: ['React', 'JavaScript', 'Redux']
   },
   {
@@ -203,7 +203,7 @@ const courses = ref([
     rating: 4.7,
     students: 567,
     enrolled: true,
-    thumbnail: 'https://via.placeholder.com/200x120/339933/ffffff?text=Node.js',
+    thumbnail: '/images/courses/backend.jpg',
     tags: ['Node.js', 'Express', 'MongoDB']
   },
   {
@@ -219,7 +219,7 @@ const courses = ref([
     rating: 4.6,
     students: 2145,
     enrolled: false,
-    thumbnail: 'https://via.placeholder.com/200x120/3776ab/ffffff?text=Python',
+    thumbnail: '/images/courses/data.jpg',
     tags: ['Python', 'Pandas', 'NumPy']
   },
   {
@@ -235,7 +235,7 @@ const courses = ref([
     rating: 4.5,
     students: 789,
     enrolled: false,
-    thumbnail: 'https://via.placeholder.com/200x120/f24e1e/ffffff?text=Design',
+    thumbnail: '/images/courses/design.jpg',
     tags: ['UI', 'UX', 'Figma']
   },
   {
@@ -251,7 +251,7 @@ const courses = ref([
     rating: 4.8,
     students: 456,
     enrolled: false,
-    thumbnail: 'https://via.placeholder.com/200x120/02569b/ffffff?text=Flutter',
+    thumbnail: '/images/courses/mobile.jpg',
     tags: ['Flutter', 'Dart', 'Mobile']
   }
 ])
