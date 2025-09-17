@@ -203,7 +203,7 @@ const recommendedCourses = ref([
     description: '学习使用 Node.js 构建高性能的后端应用',
     rating: 4.8,
     students: 1250,
-    thumbnail: '/images/courses/backend.jpg'
+    thumbnail: '/images/courses/nodejs-course.jpg'
   },
   {
     id: 5,
@@ -211,7 +211,7 @@ const recommendedCourses = ref([
     description: '掌握 Python 数据分析的核心技术和工具',
     rating: 4.6,
     students: 890,
-    thumbnail: '/images/courses/data.jpg'
+    thumbnail: '/images/courses/python-course.jpg'
   },
   {
     id: 6,

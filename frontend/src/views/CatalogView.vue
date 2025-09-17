@@ -171,7 +171,7 @@ const courses = ref([
     rating: 4.8,
     students: 1234,
     enrolled: false,
-    thumbnail: '/images/courses/frontend.jpg',
+    thumbnail: '/images/courses/vue-course.jpg',
     tags: ['Vue.js', 'JavaScript', 'TypeScript']
   },
   {
@@ -187,7 +187,7 @@ const courses = ref([
     rating: 4.9,
     students: 892,
     enrolled: false,
-    thumbnail: '/images/courses/frontend.jpg',
+    thumbnail: '/images/courses/react-course.jpg',
     tags: ['React', 'JavaScript', 'Redux']
   },
   {
@@ -203,7 +203,7 @@ const courses = ref([
     rating: 4.7,
     students: 567,
     enrolled: true,
-    thumbnail: '/images/courses/backend.jpg',
+    thumbnail: '/images/courses/nodejs-course.jpg',
     tags: ['Node.js', 'Express', 'MongoDB']
   },
   {
@@ -219,7 +219,7 @@ const courses = ref([
     rating: 4.6,
     students: 2145,
     enrolled: false,
-    thumbnail: '/images/courses/data.jpg',
+    thumbnail: '/images/courses/python-course.jpg',
     tags: ['Python', 'Pandas', 'NumPy']
   },
   {
@@ -251,7 +251,7 @@ const courses = ref([
     rating: 4.8,
     students: 456,
     enrolled: false,
-    thumbnail: '/images/courses/mobile.jpg',
+    thumbnail: '/images/courses/flutter-course.jpg',
     tags: ['Flutter', 'Dart', 'Mobile']
   }
 ])
