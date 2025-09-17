@@ -178,21 +178,21 @@ const continueLearningCourses = ref([
     title: 'Vue.js 3 完整教程',
     instructor: '张老师',
     progress: 65,
-    thumbnail: 'https://via.placeholder.com/80x60/1890ff/ffffff?text=Vue'
+    thumbnail: '/images/courses/frontend-small.jpg'
   },
   {
     id: 2,
     title: 'TypeScript 从入门到精通',
     instructor: '李老师',
     progress: 45,
-    thumbnail: 'https://via.placeholder.com/80x60/52c41a/ffffff?text=TS'
+    thumbnail: '/images/courses/typescript-small.jpg'
   },
   {
     id: 3,
     title: 'React 高级开发实战',
     instructor: '王老师',
     progress: 30,
-    thumbnail: 'https://via.placeholder.com/80x60/722ed1/ffffff?text=React'
+    thumbnail: '/images/courses/frontend-small.jpg'
   }
 ])
 
@@ -203,7 +203,7 @@ const recommendedCourses = ref([
     description: '学习使用 Node.js 构建高性能的后端应用',
     rating: 4.8,
     students: 1250,
-    thumbnail: 'https://via.placeholder.com/200x120/52c41a/ffffff?text=Node'
+    thumbnail: '/images/courses/nodejs-course.jpg'
   },
   {
     id: 5,
@@ -211,7 +211,7 @@ const recommendedCourses = ref([
     description: '掌握 Python 数据分析的核心技术和工具',
     rating: 4.6,
     students: 890,
-    thumbnail: 'https://via.placeholder.com/200x120/1890ff/ffffff?text=Python'
+    thumbnail: '/images/courses/python-course.jpg'
   },
   {
     id: 6,
@@ -219,7 +219,7 @@ const recommendedCourses = ref([
     description: '学习现代 UI/UX 设计原理和实践',
     rating: 4.7,
     students: 650,
-    thumbnail: 'https://via.placeholder.com/200x120/eb2f96/ffffff?text=Design'
+    thumbnail: '/images/courses/design.jpg'
   }
 ])
 

@@ -204,7 +204,7 @@ const courseProgress = ref([
     completedLessons: 18,
     totalLessons: 24,
     studyTime: 15,
-    thumbnail: 'https://via.placeholder.com/60x40/1890ff/ffffff?text=Vue'
+    thumbnail: '/images/courses/frontend-small.jpg'
   },
   {
     id: 2,
@@ -214,7 +214,7 @@ const courseProgress = ref([
     completedLessons: 8,
     totalLessons: 18,
     studyTime: 9,
-    thumbnail: 'https://via.placeholder.com/60x40/3178c6/ffffff?text=TS'
+    thumbnail: '/images/courses/typescript-small.jpg'
   },
   {
     id: 3,
@@ -224,7 +224,7 @@ const courseProgress = ref([
     completedLessons: 10,
     totalLessons: 32,
     studyTime: 12,
-    thumbnail: 'https://via.placeholder.com/60x40/61dafb/000000?text=React'
+    thumbnail: '/images/courses/frontend-small.jpg'
   },
   {
     id: 4,
@@ -234,7 +234,7 @@ const courseProgress = ref([
     completedLessons: 20,
     totalLessons: 20,
     studyTime: 16,
-    thumbnail: 'https://via.placeholder.com/60x40/f7df1e/000000?text=JS'
+    thumbnail: '/images/courses/javascript-small.jpg'
   },
   {
     id: 5,
@@ -244,7 +244,7 @@ const courseProgress = ref([
     completedLessons: 16,
     totalLessons: 16,
     studyTime: 12,
-    thumbnail: 'https://via.placeholder.com/60x40/1572b6/ffffff?text=CSS'
+    thumbnail: '/images/courses/css-small.jpg'
   }
 ])
 

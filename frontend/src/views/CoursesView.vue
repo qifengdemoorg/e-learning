@@ -80,7 +80,7 @@ const activeCourses = ref([
     instructor: '张老师',
     progress: 65,
     lessons: 24,
-    thumbnail: 'https://via.placeholder.com/300x180/1890ff/ffffff?text=Vue.js'
+    thumbnail: '/images/courses/vue-course.jpg'
   },
   {
     id: 2,
@@ -88,7 +88,7 @@ const activeCourses = ref([
     instructor: '李老师',
     progress: 45,
     lessons: 18,
-    thumbnail: 'https://via.placeholder.com/300x180/3178c6/ffffff?text=TypeScript'
+    thumbnail: '/images/courses/typescript-course.jpg'
   },
   {
     id: 3,
@@ -96,7 +96,7 @@ const activeCourses = ref([
     instructor: '王老师',
     progress: 30,
     lessons: 32,
-    thumbnail: 'https://via.placeholder.com/300x180/61dafb/000000?text=React'
+    thumbnail: '/images/courses/react-course.jpg'
   }
 ])
 
@@ -107,7 +107,7 @@ const completedCourses = ref([
     instructor: '赵老师',
     progress: 100,
     lessons: 20,
-    thumbnail: 'https://via.placeholder.com/300x180/f7df1e/000000?text=JavaScript'
+    thumbnail: '/images/courses/javascript.jpg'
   },
   {
     id: 5,
@@ -115,7 +115,7 @@ const completedCourses = ref([
     instructor: '周老师',
     progress: 100,
     lessons: 16,
-    thumbnail: 'https://via.placeholder.com/300x180/1572b6/ffffff?text=CSS'
+    thumbnail: '/images/courses/css.jpg'
   }
 ])
 
