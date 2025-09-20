@@ -33,3 +33,8 @@ When making significant changes:
 - Include relevant task IDs and feature descriptions
 - Align with project goals and completed milestones
 - Use conventional commit format when applicable
+
+## Additional Notes
+- If current terminal session has runing code, avoid stopping it unless absolutely necessary.
+- If current terminal session has no running code, you can run new code as needed to assist with development tasks.
+- If current terminal session has running code, you can open new terminal sessions to run additional code as needed

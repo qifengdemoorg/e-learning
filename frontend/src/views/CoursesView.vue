@@ -80,7 +80,7 @@ const activeCourses = ref([
     instructor: '张老师',
     progress: 65,
     lessons: 24,
-    thumbnail: '/images/courses/vue-course.jpg'
+    thumbnail: '/images/courses/frontend.jpg'
   },
   {
     id: 2,
@@ -88,7 +88,7 @@ const activeCourses = ref([
     instructor: '李老师',
     progress: 45,
     lessons: 18,
-    thumbnail: '/images/courses/typescript-course.jpg'
+    thumbnail: '/images/courses/typescript.jpg'
   },
   {
     id: 3,
@@ -96,7 +96,7 @@ const activeCourses = ref([
     instructor: '王老师',
     progress: 30,
     lessons: 32,
-    thumbnail: '/images/courses/react-course.jpg'
+    thumbnail: '/images/courses/frontend.jpg'
   }
 ])
 

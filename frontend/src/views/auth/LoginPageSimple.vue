@@ -134,6 +134,7 @@ const fillTestUser = (role: string) => {
   if (user) {
     formData.username = user.username
     formData.password = user.password
+    alert(`已填入${role === 'admin' ? '管理员' : role === 'teacher' ? '教师' : '学员'}测试账号`)
   }
 }
 
