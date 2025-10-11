@@ -71,7 +71,7 @@
           <div class="course-list">
             <div class="course-item" v-for="course in continueLearningCourses" :key="course.id">
               <div class="course-thumbnail">
-                <img :src="course.thumbnail" :alt="course.title" />
+                <img :src="course.thumbnail" :alt="course.title" @error="handleImageError" />
               </div>
               <div class="course-info">
                 <h3 class="course-title">{{ course.title }}</h3>
@@ -132,7 +132,7 @@
           <div class="course-grid">
             <div class="course-card" v-for="course in recommendedCourses" :key="course.id">
               <div class="course-image">
-                <img :src="course.thumbnail" :alt="course.title" />
+                <img :src="course.thumbnail" :alt="course.title" @error="handleImageError" />
               </div>
               <div class="course-content">
                 <h4 class="course-title">{{ course.title }}</h4>
@@ -167,6 +167,7 @@ import {
   StarFilled
 } from '@ant-design/icons-vue'
 import { useUserStore } from '@/stores/user'
+import { handleImageError } from '@/utils/image'
 
 const router = useRouter()
 const userStore = useUserStore()
