@@ -60,7 +60,7 @@
     <div class="course-list">
       <div v-for="course in filteredCourses" :key="course.id" class="course-item">
         <div class="course-thumbnail">
-          <img :src="course.thumbnail" :alt="course.title" />
+          <img :src="course.thumbnail" :alt="course.title" @error="handleImageError" />
           <div class="course-level">{{ course.levelText }}</div>
         </div>
         
@@ -144,6 +144,7 @@ import {
   TeamOutlined, 
   StarFilled 
 } from '@ant-design/icons-vue'
+import { handleImageError } from '@/utils/image'
 
 const router = useRouter()
 

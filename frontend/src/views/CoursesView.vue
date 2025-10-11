@@ -11,7 +11,7 @@
           <div class="course-grid">
             <div v-for="course in activeCourses" :key="course.id" class="course-card">
               <div class="course-image">
-                <img :src="course.thumbnail" :alt="course.title" />
+                <img :src="course.thumbnail" :alt="course.title" @error="handleImageError" />
                 <div class="progress-overlay">
                   <a-progress 
                     type="circle" 
@@ -40,7 +40,7 @@
           <div class="course-grid">
             <div v-for="course in completedCourses" :key="course.id" class="course-card">
               <div class="course-image">
-                <img :src="course.thumbnail" :alt="course.title" />
+                <img :src="course.thumbnail" :alt="course.title" @error="handleImageError" />
                 <div class="completed-badge">
                   <CheckCircleFilled style="color: #52c41a; font-size: 24px;" />
                 </div>
@@ -68,6 +68,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { CheckCircleFilled } from '@ant-design/icons-vue'
+import { handleImageError } from '@/utils/image'
 
 const router = useRouter()
 const activeTab = ref('active')
