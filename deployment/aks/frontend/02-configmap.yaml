@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: elearning-frontend-config
-  namespace: elearning
+  namespace: #{NAMESPACE}#
   labels:
     app: elearning-frontend
     component: frontend

@@ -2,7 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: elearning-frontend-ingress
-  namespace: elearning
+  namespace: #{NAMESPACE}#
   labels:
     app: elearning-frontend
     component: frontend
