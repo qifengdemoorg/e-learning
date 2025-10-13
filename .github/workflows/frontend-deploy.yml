@@ -211,10 +211,29 @@ jobs:
         echo "Creating namespace: ${{ steps.deployment_target.outputs.namespace }}"
         kubectl apply -f deployment/aks/frontend/${{ steps.deployment_target.outputs.namespace_file }}
     
+    - name: Update all manifests with namespace and variables
+      run: |
+        NAMESPACE="${{ steps.deployment_target.outputs.namespace }}"
+        echo "Updating all manifests for namespace: $NAMESPACE"
+        
+        # Backup all files
+        cp deployment/aks/frontend/02-configmap.yaml deployment/aks/frontend/02-configmap.yaml.backup
+        cp deployment/aks/frontend/04-service.yaml deployment/aks/frontend/04-service.yaml.backup
+        cp deployment/aks/frontend/05-ingress.yaml deployment/aks/frontend/05-ingress.yaml.backup
+        cp deployment/aks/frontend/06-hpa.yaml deployment/aks/frontend/06-hpa.yaml.backup
+        
+        # Replace namespace in all manifests
+        sed -i "s|#{NAMESPACE}#|${NAMESPACE}|g" deployment/aks/frontend/02-configmap.yaml
+        sed -i "s|#{NAMESPACE}#|${NAMESPACE}|g" deployment/aks/frontend/04-service.yaml
+        sed -i "s|#{NAMESPACE}#|${NAMESPACE}|g" deployment/aks/frontend/05-ingress.yaml
+        sed -i "s|#{NAMESPACE}#|${NAMESPACE}|g" deployment/aks/frontend/06-hpa.yaml
+        
+        echo "✅ All manifests updated with namespace: $NAMESPACE"
+    
     - name: Apply ConfigMaps and Secrets
       run: |
         echo "Applying ConfigMap to namespace: ${{ steps.deployment_target.outputs.namespace }}"
-        kubectl apply -f deployment/aks/frontend/02-configmap.yaml -n ${{ steps.deployment_target.outputs.namespace }}
+        kubectl apply -f deployment/aks/frontend/02-configmap.yaml
     
     - name: Extract image tag from build output
       id: image_info
@@ -234,6 +253,8 @@ jobs:
         # Create a backup of the original file
         cp deployment/aks/frontend/03-deployment.yaml deployment/aks/frontend/03-deployment.yaml.backup
         
+        NAMESPACE="${{ steps.deployment_target.outputs.namespace }}"
+        
         # Update deployment manifest with the actual built image tag
         # Replace image variables
         sed -i 's|#{ACR_LOGIN_SERVER}#|${{ env.ACR_LOGIN_SERVER }}|g' deployment/aks/frontend/03-deployment.yaml
@@ -241,7 +262,7 @@ jobs:
         sed -i 's|#{IMAGE_TAG}#|${{ steps.image_info.outputs.tag_only }}|g' deployment/aks/frontend/03-deployment.yaml
         
         # Update namespace based on branch
-        sed -i 's|namespace: elearning|namespace: ${{ steps.deployment_target.outputs.namespace }}|g' deployment/aks/frontend/03-deployment.yaml
+        sed -i "s|#{NAMESPACE}#|${NAMESPACE}|g" deployment/aks/frontend/03-deployment.yaml
         
         # For URL replacement, ensure proper quoting
         if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
@@ -277,22 +298,22 @@ jobs:
         NAMESPACE="${{ steps.deployment_target.outputs.namespace }}"
         echo "Deploying to namespace: $NAMESPACE"
         
-        # Apply all manifests in order
+        # Apply all manifests in order (namespace is already set in the YAML files)
         echo "Applying deployment manifest..."
         kubectl apply -f deployment/aks/frontend/03-deployment.yaml
         
         echo "Applying service manifest..."
-        kubectl apply -f deployment/aks/frontend/04-service.yaml -n $NAMESPACE
+        kubectl apply -f deployment/aks/frontend/04-service.yaml
         
         echo "Applying ingress manifest..."
-        kubectl apply -f deployment/aks/frontend/05-ingress.yaml -n $NAMESPACE
+        kubectl apply -f deployment/aks/frontend/05-ingress.yaml
         
         echo "Applying HPA manifest..."
-        kubectl apply -f deployment/aks/frontend/06-hpa.yaml -n $NAMESPACE
+        kubectl apply -f deployment/aks/frontend/06-hpa.yaml
         
         echo "Checking deployment status..."
         kubectl get deployments -n $NAMESPACE
-       # kubectl apply -f deployment/aks/frontend/07-network-policy.yaml -n $NAMESPACE
+       # kubectl apply -f deployment/aks/frontend/07-network-policy.yaml
     
     - name: Wait for deployment rollout
       run: |

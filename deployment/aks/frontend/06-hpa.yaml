@@ -2,7 +2,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: elearning-frontend-hpa
-  namespace: elearning
+  namespace: #{NAMESPACE}#
   labels:
     app: elearning-frontend
     component: frontend

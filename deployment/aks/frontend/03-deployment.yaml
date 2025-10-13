@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: elearning-frontend
-  namespace: elearning
+  namespace: #{NAMESPACE}#
   labels:
     app: elearning-frontend
     component: frontend
