@@ -2,13 +2,13 @@ name: Frontend CI/CD - Azure AKS
 
 on:
   pull_request:
-    # branches: [main, develop]
     paths:
       - 'frontend/**'
       - '.github/workflows/frontend-deploy.yml'
       - 'deployment/aks/frontend/**'
   push:
-    branches: [main]
+    branches:
+      - '**'  # 所有分支都触发 push
     paths:
       - 'frontend/**'
       - '.github/workflows/frontend-deploy.yml'
@@ -54,14 +54,16 @@ jobs:
       working-directory: ./frontend
       run: npm run build
 
-    # Only build and push Docker image on main branch or when secrets are available
+    # Build and push Docker image for all branches (not PRs)
     - name: Check if push is needed
       id: should_push
       run: |
-        if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+        if [[ "${{ github.event_name }}" == "push" ]]; then
           echo "should_push=true" >> $GITHUB_OUTPUT
+          echo "::notice::Will push image for branch: ${{ github.ref_name }}"
         else
           echo "should_push=false" >> $GITHUB_OUTPUT
+          echo "::notice::Pull request - will not push image"
         fi
 
     # Azure Container Registry login (only when pushing)
@@ -168,12 +170,27 @@ jobs:
   deploy:
     needs: [build]
     runs-on: ubuntu-latest
-    environment: production
-    if: github.ref == 'refs/heads/main'
+    environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'uat' }}
+    if: github.event_name == 'push'
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+    
+    - name: Determine deployment target
+      id: deployment_target
+      run: |
+        if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+          echo "namespace=elearning" >> $GITHUB_OUTPUT
+          echo "environment=production" >> $GITHUB_OUTPUT
+          echo "namespace_file=01-namespace.yaml" >> $GITHUB_OUTPUT
+          echo "::notice::Deploying to PRODUCTION (elearning namespace)"
+        else
+          echo "namespace=elearning-uat" >> $GITHUB_OUTPUT
+          echo "environment=uat" >> $GITHUB_OUTPUT
+          echo "namespace_file=01-namespace-uat.yaml" >> $GITHUB_OUTPUT
+          echo "::notice::Deploying to UAT (elearning-uat namespace) for branch: ${{ github.ref_name }}"
+        fi
     
     - name: Azure Login
       uses: azure/login@v1
@@ -191,11 +208,13 @@ jobs:
     
     - name: Create namespace if not exists
       run: |
-        kubectl apply -f deployment/aks/frontend/01-namespace.yaml
+        echo "Creating namespace: ${{ steps.deployment_target.outputs.namespace }}"
+        kubectl apply -f deployment/aks/frontend/${{ steps.deployment_target.outputs.namespace_file }}
     
     - name: Apply ConfigMaps and Secrets
       run: |
-        kubectl apply -f deployment/aks/frontend/02-configmap.yaml
+        echo "Applying ConfigMap to namespace: ${{ steps.deployment_target.outputs.namespace }}"
+        kubectl apply -f deployment/aks/frontend/02-configmap.yaml -n ${{ steps.deployment_target.outputs.namespace }}
     
     - name: Extract image tag from build output
       id: image_info
@@ -216,16 +235,33 @@ jobs:
         cp deployment/aks/frontend/03-deployment.yaml deployment/aks/frontend/03-deployment.yaml.backup
         
         # Update deployment manifest with the actual built image tag
-        # Use single quotes and escape properly to avoid YAML issues
+        # Replace image variables
         sed -i 's|#{ACR_LOGIN_SERVER}#|${{ env.ACR_LOGIN_SERVER }}|g' deployment/aks/frontend/03-deployment.yaml
+        sed -i 's|#{CONTAINER_NAME}#|${{ env.CONTAINER_NAME }}|g' deployment/aks/frontend/03-deployment.yaml
         sed -i 's|#{IMAGE_TAG}#|${{ steps.image_info.outputs.tag_only }}|g' deployment/aks/frontend/03-deployment.yaml
         
+        # Update namespace based on branch
+        sed -i 's|namespace: elearning|namespace: ${{ steps.deployment_target.outputs.namespace }}|g' deployment/aks/frontend/03-deployment.yaml
+        
         # For URL replacement, ensure proper quoting
-        API_BASE_URL="https://api.elearning.demo.com"
+        if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+          API_BASE_URL="https://api.elearning.demo.com"
+        else
+          API_BASE_URL="https://api-uat.elearning.demo.com"
+        fi
         sed -i "s|#{VITE_API_BASE_URL}#|${API_BASE_URL}|g" deployment/aks/frontend/03-deployment.yaml
+        
+        echo "=== Deployment Configuration ==="
+        echo "Namespace: ${{ steps.deployment_target.outputs.namespace }}"
+        echo "Environment: ${{ steps.deployment_target.outputs.environment }}"
+        echo "Branch: ${{ github.ref_name }}"
+        echo "API URL: ${API_BASE_URL}"
         
         echo "=== Updated deployment manifest ==="
         cat deployment/aks/frontend/03-deployment.yaml | grep -A 10 -B 5 "image:"
+        
+        echo "=== Namespace section ==="
+        cat deployment/aks/frontend/03-deployment.yaml | grep -A 2 -B 2 "namespace:"
         
         echo "=== Environment variables section ==="
         cat deployment/aks/frontend/03-deployment.yaml | grep -A 10 -B 2 "VITE_API_BASE_URL"
@@ -238,40 +274,50 @@ jobs:
     
     - name: Deploy application
       run: |
+        NAMESPACE="${{ steps.deployment_target.outputs.namespace }}"
+        echo "Deploying to namespace: $NAMESPACE"
+        
         # Apply all manifests in order
         echo "Applying deployment manifest..."
         kubectl apply -f deployment/aks/frontend/03-deployment.yaml
         
         echo "Applying service manifest..."
-        kubectl apply -f deployment/aks/frontend/04-service.yaml
+        kubectl apply -f deployment/aks/frontend/04-service.yaml -n $NAMESPACE
         
         echo "Applying ingress manifest..."
-        kubectl apply -f deployment/aks/frontend/05-ingress.yaml
+        kubectl apply -f deployment/aks/frontend/05-ingress.yaml -n $NAMESPACE
         
         echo "Applying HPA manifest..."
-        kubectl apply -f deployment/aks/frontend/06-hpa.yaml
+        kubectl apply -f deployment/aks/frontend/06-hpa.yaml -n $NAMESPACE
         
         echo "Checking deployment status..."
-        kubectl get deployments -n elearning
-       # kubectl apply -f deployment/aks/frontend/07-network-policy.yaml
+        kubectl get deployments -n $NAMESPACE
+       # kubectl apply -f deployment/aks/frontend/07-network-policy.yaml -n $NAMESPACE
     
     - name: Wait for deployment rollout
       run: |
-        kubectl rollout status deployment/elearning-frontend -n elearning --timeout=600s
+        NAMESPACE="${{ steps.deployment_target.outputs.namespace }}"
+        echo "Waiting for rollout in namespace: $NAMESPACE"
+        kubectl rollout status deployment/elearning-frontend -n $NAMESPACE --timeout=600s
     
     - name: Verify deployment health
       run: |
+        NAMESPACE="${{ steps.deployment_target.outputs.namespace }}"
+        echo "Verifying deployment health in namespace: $NAMESPACE"
+        
         echo "Checking pod status..."
-        kubectl get pods -n elearning -l app=elearning-frontend
+        kubectl get pods -n $NAMESPACE -l app=elearning-frontend
         
         echo "Checking service status..."
-        kubectl get svc -n elearning -l app=elearning-frontend
+        kubectl get svc -n $NAMESPACE -l app=elearning-frontend
         
         echo "Checking ingress status..."
-        kubectl get ingress -n elearning
+        kubectl get ingress -n $NAMESPACE
         
         echo "Checking HPA status..."
-        kubectl get hpa -n elearning
+        kubectl get hpa -n $NAMESPACE
         
         # Wait for pods to be ready
-        kubectl wait --for=condition=ready pod -l app=elearning-frontend -n elearning --timeout=300s
+        kubectl wait --for=condition=ready pod -l app=elearning-frontend -n $NAMESPACE --timeout=300s
+        
+        echo "✅ Deployment completed successfully to ${{ steps.deployment_target.outputs.environment }} environment!"

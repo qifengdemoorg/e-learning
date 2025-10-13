@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: elearning-uat
+  labels:
+    name: elearning-uat
+    environment: uat
+    app.kubernetes.io/name: elearning
+    app.kubernetes.io/component: platform
+    app.kubernetes.io/environment: uat
